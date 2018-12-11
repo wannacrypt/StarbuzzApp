@@ -1,6 +1,9 @@
 package co.wannacrypt.starbuzz;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.support.design.widget.TabItem;
 import android.support.design.widget.TabLayout;
@@ -12,11 +15,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
     private TabItem tabStores;
     private TabItem tabFavorites;
     private Button button;
+    private static ArrayList<String> drinkList;
+    private static ArrayList<String> foodList;
+    private static ArrayList<String> storeList;
 
     public static Set<String> favoriteList;
     public static final String DATA = "co.wannacrypt.starbuzz.DATA";
@@ -38,6 +43,55 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        drinkList = new ArrayList<>();
+        foodList = new ArrayList<>();
+        storeList = new ArrayList<>();
+
+        SQLiteDatabase myDatabase = this.openOrCreateDatabase("StarbuzzDB", MODE_PRIVATE, null);
+        myDatabase.execSQL("CREATE TABLE IF NOT EXISTS drinks (name VARCHAR)");
+        myDatabase.execSQL("CREATE TABLE IF NOT EXISTS food (name VARCHAR)");
+        myDatabase.execSQL("CREATE TABLE IF NOT EXISTS stores (name VARCHAR)");
+
+        myDatabase.execSQL("INSERT INTO drinks (name) VALUES ('Raspberry Cola')");
+        myDatabase.execSQL("INSERT INTO food (name) VALUES ('Burger')");
+        myDatabase.execSQL("INSERT INTO stores (name) VALUES ('Cherry Creek')");
+
+        try {
+            Cursor c = myDatabase.rawQuery("SELECT * FROM drinks", null);
+            int drinkNameIndex = c.getColumnIndex("name");
+            c.moveToFirst();
+            while (c != null) {
+                drinkList.add(c.getString(drinkNameIndex));
+                c.moveToNext();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Cursor c = myDatabase.rawQuery("SELECT * FROM food", null);
+            int foodNameIndex = c.getColumnIndex("name");
+            c.moveToFirst();
+            while (c != null) {
+                foodList.add(c.getString(foodNameIndex));
+                c.moveToNext();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Cursor c = myDatabase.rawQuery("SELECT * FROM stores", null);
+            int storeNameIndex = c.getColumnIndex("name");
+            c.moveToFirst();
+            while (c != null) {
+                storeList.add(c.getString(storeNameIndex));
+                c.moveToNext();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         favoriteList = new HashSet<>();
 
@@ -101,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+//        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
 
     }
 
@@ -112,5 +166,17 @@ public class MainActivity extends AppCompatActivity {
         for (String str : set)
             al.add(str);
         return al;
+    }
+
+    public static ArrayList<String> getDrinkList() {
+        return drinkList;
+    }
+
+    public static ArrayList<String> getFoodList() {
+        return foodList;
+    }
+
+    public static ArrayList<String> getStoreList() {
+        return storeList;
     }
 }

@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,44 +26,26 @@ public class DrinkFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_drink, container, false);
 
-        final CheckBox checkBox = rootView.findViewById(R.id.checkBox);
-        final CheckBox checkBox2 = rootView.findViewById(R.id.checkBox2);
-        final CheckBox checkBox3 = rootView.findViewById(R.id.checkBox3);
+        LinearLayout ll = rootView.findViewById(R.id.drinkLayout);
 
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    MainActivity.getFavoriteList().add(checkBox.getText().toString());
-                } else {
-                    MainActivity.getFavoriteList().remove(checkBox.getText().toString());
+        ArrayList<String> arr = MainActivity.getDrinkList();
+
+        for (String s : arr) {
+            final CheckBox cb = new CheckBox(getActivity().getApplicationContext());
+            cb.setText(s);
+
+            cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked)
+                        MainActivity.getFavoriteList().add(cb.getText().toString());
+                    else
+                        MainActivity.getFavoriteList().remove(cb.getText().toString());
                 }
-            }
-        });
+            });
 
-        checkBox2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    MainActivity.getFavoriteList().add(checkBox2.getText().toString());
-                } else {
-                    MainActivity.getFavoriteList().remove(checkBox2.getText().toString());
-
-                }
-            }
-        });
-
-        checkBox3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    MainActivity.getFavoriteList().add(checkBox3.getText().toString());
-                } else {
-                    MainActivity.getFavoriteList().remove(checkBox3.getText().toString());
-
-                }
-            }
-        });
+            ll.addView(cb);
+        }
 
         // Inflate the layout for this fragment
         return rootView;
